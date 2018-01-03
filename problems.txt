@@ -1,0 +1,36 @@
+======================================================================================
+1. 安装软件失败，库版本号不匹配
+sudo apt-get install zlib1g-dev 
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ zlib1g-dev : Depends: zlib1g (= 1:1.2.8.dfsg-2ubuntu4) but 1:1.2.8.dfsg-2ubuntu4.1 is to be installed
+E: Unable to correct problems, you have held broken packages.
+
+2. 查看版本：
+kdt@kdt-XPS-13-9343:~/workspace/rda-fp-8910$ dpkg -l | grep zlib1g
+ii  zlib1g:amd64                                1:1.2.8.dfsg-2ubuntu4.1                    amd64        compression library - runtime
+
+3.安装指定版本号，
+kdt@kdt-XPS-13-9343:~/workspace/rda-fp-8910$ sudo apt-get install zlib1g=1:1.2.8.dfsg-2ubuntu4
+
+4. dpkg --get-selection | grep zlib1g
+
+======================================================================================
+1. 安装软件失败，并导致apt-get失灵
+1 not fully installed or removed.
+
+2. 删除未完全安装的packeges
+sudo dpkg -r oracle-java6-jdk
+
+3. 重建依赖关系
+sudo apt-get install -f
+
+

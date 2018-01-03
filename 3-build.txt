@@ -1,0 +1,139 @@
+Building the Android Platform
+This section describes how to build the RDA version of Android.
+Initialize
+Initialize the environment with the envsetup.sh script.
+$ source build/envsetup.sh
+
+including device/moto/stingray/vendorsetup.sh
+including device/moto/wingray/vendorsetup.sh
+including device/rda/common/vendorsetup.sh
+including device/rda/rda8810/vendorsetup.sh
+including device/samsung/crespo4g/vendorsetup.sh
+including device/samsung/crespo/vendorsetup.sh
+including device/samsung/maguro/vendorsetup.sh
+including device/samsung/torospr/vendorsetup.sh
+including device/samsung/toro/vendorsetup.sh
+including device/samsung/tuna/vendorsetup.sh
+including device/ti/panda/vendorsetup.sh
+including sdk/bash_completion/adb.bash
+$
+Alternative: Note that replacing "source" with a single dot saves a few characters, and the short form is more commonly used in documentation.
+$ . build/envsetup.sh
+Choose a Target
+Choose which target to build with lunch.
+$ lunch 
+
+You're building on Linux
+
+Lunch menu... pick a combo:
+     1. full-eng
+     2. full_x86-eng
+     3. vbox_x86-eng
+     4. full_stingray-userdebug
+     5. full_wingray-userdebug
+     6. rda8810-userdebug
+     7. rda8810-eng
+     8. full_crespo4g-userdebug
+     9. full_crespo-userdebug
+     10. full_maguro-userdebug
+     11. full_torospr-userdebug
+     12. full_toro-userdebug
+     13. full_tuna-userdebug
+     14. full_panda-eng
+
+Which would you like? [full-eng] rda8810-eng
+
+============================================
+PLATFORM_VERSION_CODENAME=REL
+PLATFORM_VERSION=4.0.4
+TARGET_PRODUCT=rda8810
+TARGET_BUILD_VARIANT=eng
+TARGET_BUILD_TYPE=release
+TARGET_BUILD_APPS=
+TARGET_ARCH=arm
+TARGET_ARCH_VARIANT=armv7-a-neon
+HOST_ARCH=x86
+HOST_OS=linux
+HOST_BUILD_TYPE=release
+BUILD_ID=IMM76I
+============================================
+$
+Alternative: The exact configuration can be passed as an argument, e.g.
+$ lunch rda8810-eng
+
+============================================
+PLATFORM_VERSION_CODENAME=REL
+PLATFORM_VERSION=4.0.4
+TARGET_PRODUCT=rda8810
+TARGET_BUILD_VARIANT=eng
+TARGET_BUILD_TYPE=release
+TARGET_BUILD_APPS=
+TARGET_ARCH=arm
+TARGET_ARCH_VARIANT=armv7-a-neon
+HOST_ARCH=x86
+HOST_OS=linux
+HOST_BUILD_TYPE=release
+BUILD_ID=IMM76I
+============================================
+$
+Build the Code
+Build everything with make. GNU make can handle parallel tasks with a -jN argument, and it's common to use a number of tasks N that's between 1 and 2 times the number of hardware threads on the computer being used for the build. E.g. on a dual-E5520 machine (2 CPUs, 4 cores per CPU, 2 threads per core), the fastest builds are made with commands between make -j16 and make -j32.
+$ make -j8
+Using ccache
+ccache is a compiler cache for C and C++ that can help make builds faster. In the root of the source tree, do the following:
+$ export USE_CCACHE=1
+$ export CCACHE_DIR=/<path_of_your_choice>/.ccache
+$ prebuilts/misc/linux-x86/ccache/ccache -M 50G
+The suggested cache size is 50-100G.
+Cleaning Up
+Execute % m clean to clean up the binaries you just created. You can also execute % m clobber to get rid of the binaries of all combos. % m clobber is equivalent to removing the //out/ directory where all generated files are stored.
+$ make clean
+Alternative: e.g.
+$ rm -rf ./out ./v8.log > /dev/null
+$
+$ repo forall -c 'git clean -xdf; git reset --hard' > /dev/null
+Building the Android Kernel
+This section describes how to build RDA version of Android's kernel.
+Troubleshooting
+Troubleshooting Common Build Errors
+Wrong GNU Make Version
+Android's build system is make based and requires a recent version of GNU Make (note that Android uses advanced features of GNU Make that may not yet appear on the GNU Make web site). Before continuing, check your version of make by running % make -v. If you don't have version 3.81, you need to upgrade your version of make.
+$ make
+........................................................................................
+build/core/main.mk:42: ********************************************************************************
+build/core/main.mk:43: *  You are using version 3.8 of make.
+build/core/main.mk:44: *  Android can only be built by version 3.81.
+build/core/main.mk:45: *  see http://source.android.com/source/download.html
+build/core/main.mk:46: ********************************************************************************
+build/core/main.mk:47: *** stopping.  Stop.
+Wrong Java Version
+Building Android requires Sun JDK 5 or 6 depending on which release you are building.
+If you are attempting to build froyo or earlier with Java 1.6, or gingerbread or later with Java 1.5, make will abort with a message such as
+$ make
+........................................................................................
+============================================
+Checking build tools versions...
+************************************************************
+You are attempting to build with the incorrect version
+of java.
+
+Your version is: java version "WRONG_VERSION".
+The correct version is: Java SE 1.6.
+
+Please follow the machine setup instructions at
+    http://source.android.com/source/download.html
+************************************************************
+build/core/main.mk:131: *** stop.  Stop.
+This may be caused by
+failing to install the correct JDK as specified on the SettingBuildEnvironment page.
+another JDK that you previously installed appearing in your path. Try to change the default java version with the following command:
+$ sudo update-alternatives --config java
+Wrong mkimage not found
+$ make
+........................................................................................
+mkimage -A arm -T standalone -C none -a 0x00100100 -e 0x00100100 -n 'pdl1' -d pdl1.bin pdl1_u.bin
+make[2]: mkimage: Command not found
+make[2]: *** [pdl1_u.bin] Error 127
+uboot-mkimage - generate kernel image for U-Boot
+$ sudo apt-get install uboot-mkimage u-boot-tools
+Reference

@@ -1,0 +1,204 @@
+Getting Started
+Installing Git
+To instal git and its dependencies, follow these steps:
+  $
+  $ sudo apt-get update && sudo apt-get install software-properties-common
+  $ sudo add-apt-repository ppa:git-core/ppa
+  $ sudo apt-get update && sudo apt-get install git git-doc git-man curl vim
+  $
+  $ git --version
+  $
+
+
+Configure Git
+
+Configure git with your username and email address. Make sure this is your company email address at which you can receive messages.
+  $
+  $ git config --global user.name "your_username"
+  $ git config --global user.email "your_email"
+  $
+
+some other things you might like to do:
+  $
+  $ git config --global core.editor vim # set your favorite text editor, possible values include: vim, emacs, notepad, etc.
+  $ git config --global color.ui auto   # colorised `git diff` output, etc.
+  $
+
+Installation Options line endings
+
+For users of Linux/Mac:
+  $
+  $ git config --global core.autocrlf input
+  $ git config --global core.safecrlf true
+  $
+Also, for Windows users:
+  $
+  $ git config --global core.autocrlf true
+  $ git config --global core.safecrlf true
+  $
+To review your git configuration:
+  $
+  $ git config --list
+  $
+
+
+Installing Repo
+
+Download the repo script and ensure it is executable:
+  $
+  $ sudo sh -c 'curl http://git.rdamicro.com/twiki/pub/SmartPhone/DownloadCenter/repo > /usr/bin/repo'
+  $ sudo chmod a+x /usr/bin/repo
+  $
+
+Register on Gerrit
+
+We are using Gerrit for code review and automatic integration of reviewed patches.
+Gerrit Code Review uses public-key cryptography and SSH to authenticate you during git's push and pull commands to hosted projects.
+Registering your public key allows Gerrit to identify you whenever you connect through SSH.
+
+Check whether there are any ssh keys already. You’re looking for two files, id_rsa and id_rsa.pub.
+  $
+  $ ls ~/.ssh
+  id_rsa  id_rsa.pub
+  $
+If you have the files, you may skip the key generating step.
+If you don’t see the files in your listing, your will have to generate rsa keys for your ssh sessions:
+
+SSH key generation
+
+Please don’t generate new keys if you already have a valid keypair! They will be overwritten!
+  $
+  $ ssh-keygen -t rsa -C "your_email"
+    Generating public/private rsa key pair.
+    Enter file in which to save the key (/home/user/.ssh/id_rsa):
+    Created directory '/home/user/.ssh'.
+    Enter passphrase (empty for no passphrase):
+    Enter same passphrase again:
+    Your identification has been saved in /home/user/.ssh/id_rsa.
+    Your public key has been saved in /home/user/.ssh/id_rsa.pub.
+    The key fingerprint is:
+    00:11:22:00:11:22:00:11:44:00:11:22:00:11:22:99 user@host
+    The key's randomart image is:
+    +--[ RSA 2048]----+
+    |     ..+.*=+oo.*E|
+    |      u.OoB.. . +|
+    |       ..*.      |
+    |       o         |
+    |      . S ..     |
+    |                 |
+    |                 |
+    |          ..     |
+    |                 |
+    +-----------------+
+  $
+  $ ls ~/.ssh
+  id_rsa  id_rsa.pub
+  $
+
+Registering your key in Gerrit
+
+Navigate to the URL of Gerrit: http://gerrit.rdamicro.com/ and press Sign In.
+
+Signing up using LDAP( Active Directory) Account
+Username: (your e-mail username)
+Password: (your e-mail password)
+Once signed in as your user, you find a little wizard to get you started. The wizard helps you fill out:
+Real name (visible name in Gerrit)
+
+Register your email (Make sure this is your company email address at which you can receive messages.)
+Select a username with which to communicate with Gerrit over ssh+git
+The server will ask you for an RSA public key. That’s the key we generated above, and it’s time to make sure that Gerrit knows about our new key and can identify us by it.
+  $
+  $ cat .ssh/id_rsa.pub
+  ssh-rsa   AAAAB3NzaC1yc2EAAAADAQABAAABAQ...feFIumcbTH...Jqau+jtzuigydoVj4j9xidcJ9HtxZcJNuraw== user@localhost
+  $
+Copy the string starting with ssh-rsa to your clipboard and then paste it into the box for RSA keys. Make absolutely sure no extra spaces or line feeds are entered in the middle of the RSA string.
+Verify that the ssh connection works for you.
+  $
+  $ ssh -p 29418 gerrit.rdamicro.com
+
+  ****    Welcome to Gerrit Code Review    ****
+
+  Hi user, you have successfully connected over SSH.
+
+  Unfortunately, interactive shells are disabled.
+  To clone a hosted Git repository, use:
+
+  git clone ssh://user@gerrit.rdamicro.com:29418/REPOSITORY_NAME.git
+
+  Connection to gerrit.rdamicro.com closed.
+  $
+
+
+Getting source code
+
+Getting the rdadroid source code
+Set up your client to access the rdadroid source repository:
+The current development branch: rdadroid-7.0
+  $
+  $ mkdir -p ~/workspace/rdadroid-7.0
+  $ cd ~/workspace/rdadroid-7.0
+  $
+  $ repo init -u ssh://git.rdamicro.com:29418/android/platform/manifest.git -b rdadroid-7.0 \
+  --repo-url=ssh://git.rdamicro.com:29418/android/tools/repo.git --no-repo-verify
+  $
+  $ repo sync
+  $
+The customer release branch: rdadroid-4.4.2_r1-rel7.0.y
+  $
+  $ mkdir -p ~/workspace/rdadroid-4.4.2_r1-rel7.0.y
+  $ cd ~/workspace/rdadroid-4.4.2_r1-rel7.0.y
+  $
+  $ repo init -u ssh://git.rdamicro.com:29418/android/platform/manifest.git -b rdadroid-4.4.2_r1-rel7.0.y \
+  --repo-url=ssh://git.rdamicro.com:29418/android/tools/repo.git --no-repo-verify
+  $
+  $ repo sync
+  $
+
+
+Troubleshooting
+
+Permission denied (publickey)
+With this error message an SSH command to Gerrit is rejected if the SSH authentication is not successful.
+1) If your OS login name and the username of the gerrit are not the same, May cause the SSH authentication failure. It shows error message like this:
+  $
+  $ ssh -p 29418 gerrit.rdamicro.com
+ The authenticity of host '[gerrit.rdamicro.com]:29418 ([192.168.193.172]:29418)' can't be established.
+ RSA key fingerprint is 33:8b:54:7b:d5:94:5b:73:d9:76:f9:93:97:d5:40:72.
+ Are you sure you want to continue connecting (yes/no)? yes
+ Warning: Permanently added '[gerrit.rdamicro.com]:29418,[192.168.193.172]:29418' (RSA) to the list of known hosts.
+ Permission denied (publickey).
+  $
+A: Using SSH Host Alias
+  $
+  $ vim ~/.ssh/config
+  ----------------------------------------------------------------------------------------------------
+  #host git.rdamicro.com
+  user user
+  hostname git.rdamicro.com
+  Port 29418
+  identityfile ~/.ssh/id_rsa
+  ----------------------------------------------------------------------------------------------------
+   $
+   $ chmod 0600 ~/.ssh/config
+   $ chmod 0600 ~/.ssh/id_rsa
+   $
+   $ ssh-agent $SHELL
+   $ ssh-add ~/.ssh/id_rsa
+   $
+Verify that the ssh connection works for you.
+  $
+  $ ssh -p 29418 gerrit.rdamicro.com
+
+    ****    Welcome to Gerrit Code Review    ****
+
+    Hi user, you have successfully connected over SSH.
+
+    Unfortunately, interactive shells are disabled.
+    To clone a hosted Git repository, use:
+
+    git clone ssh://user@gerrit.rdamicro.com:29418/REPOSITORY_NAME.git
+
+    Connection to gerrit.rdamicro.com closed.
+  $
+Reference
