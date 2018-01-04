@@ -34,3 +34,10 @@ sudo dpkg -r oracle-java6-jdk
 sudo apt-get install -f
 
 
+======================================================================================
+1. 编译bootimage失败,log如下：
+prebuilts/misc/linux-x86/bison/bison: No such file or directory
+主要原因是bison缺少运行库
+2. 解决方法
+sudo apt-get install gcc-multilib g++-multilib lib32ncurses5-dev lib32z1-dev
+

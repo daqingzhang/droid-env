@@ -2,8 +2,9 @@
 ----------------------------------------------------------------------
 sudo apt-get install openjdk-8-jdk
 sudo apt-get install gnupg flex bison gperf build-essential zip curl
+sudo apt-get install gcc-multilib g++-multilib lib32ncurses5-dev lib32z1-dev
 
-2. Build droid7.0 project
+2. Build droid7.0 project image
 ----------------------------------------------------------------------
 bootloader:
 	cd workspace/xxxdroid-7.0
@@ -12,5 +13,20 @@ bootloader:
 	make clean
 	make bootloader -j8
 
-bootimage:
+boot:
 	make bootimage -j8
+
+system:
+	make systemimage -j8
+
+vendor:
+	make vendorimage -j8
+
+3. download image by fastboot
+----------------------------------------------------------------------
+	cdout
+	fastboot flash bootloader bootloader.img
+	fastboot flash boot boot.img
+	fastboot flash vendor vendor.img
+	fastboot flash system system.img
+
